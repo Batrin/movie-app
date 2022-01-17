@@ -1,0 +1,23 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    list-style-type: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+.movie-app-outer {
+    width: 100%;
+    background-color: #E5E5E5;
+}
+
+.movie-app-inner {
+    max-width: 1010px;
+    background-color: white;
+    margin: 0 auto;
+}
