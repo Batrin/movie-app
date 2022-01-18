@@ -7,7 +7,7 @@
     display: flex;
     font-family: 'Inter', sans-serif;
     margin-top: 34px;
-
+    text-align: left;
 }
 
 .movie-poster {

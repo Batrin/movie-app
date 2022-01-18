@@ -14,10 +14,16 @@ a {
 .movie-app-outer {
     width: 100%;
     background-color: #E5E5E5;
+    height: 100%;
 }
 
 .movie-app-inner {
     max-width: 1010px;
     background-color: white;
     margin: 0 auto;
+    min-height: 100vh;
+    height: 100%;
+    padding-top: 20px;
+    text-align: center;
+    padding-bottom: 20px;
 }
