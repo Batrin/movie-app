@@ -1,53 +1,38 @@
 import React from 'react';
-
-import './movie-list-item.css';
 import PropTypes from 'prop-types';
-import { format } from 'date-fns';
+import './movie-list-item.css';
+import defaultImage from './defaultPoster.jpg';
 
-function MovieListItem({ movieTitle, releaseDate, genres, des, posterPath }) {
-  const imagePath = `https://image.tmdb.org/t/p/w500${posterPath}`;
+function MovieListItem({ movie }) {
+  const { movieTitle, movieReleaseDate, movieOverview, movieImageUrl, movieAvgRating, movieGenres } = movie;
+  let movieImg = defaultImage;
 
-  function textFormat(text) {
-    const wordArray = text.split(' ');
-    wordArray.splice(20, wordArray.length);
-    const finalOverview = `${wordArray.join(' ')}...`;
-    return finalOverview;
-  }
-
-  function dateFormat(date) {
-    const formatedDate = format(new Date(date), 'MMMM d, yyyy');
-    return formatedDate;
+  if (movieImageUrl) {
+    movieImg = movieImageUrl;
   }
 
   return (
-    <li className="movie">
+    <li className="movie-list-item">
       <div className="movie-poster">
-        <img src={imagePath} alt="" />
+        <img src={movieImg} alt="Movie" />
       </div>
       <div className="movie-info">
-        <h5 className="movie-title">{movieTitle}</h5>
-        <p className="movie-date">{dateFormat(releaseDate)}</p>
-        <p className="movie-genres">{genres}</p>
-        <p className="movie-overview">{textFormat(des)}</p>
+        <div className="movie-top-panel">
+          <h5 className="movie-title">{movieTitle}</h5>
+          <div className="movie-rating-circle">
+            <p className="movie-rating">{movieAvgRating}</p>
+          </div>
+        </div>
+        <p className="movie-date">{movieReleaseDate}</p>
+        <p className="movie-genres">{movieGenres}</p>
+        <p className="movie-overview">{movieOverview}</p>
       </div>
     </li>
   );
 }
 
 MovieListItem.propTypes = {
-  movieTitle: PropTypes.string,
-  releaseDate: PropTypes.string,
-  genres: PropTypes.arrayOf(PropTypes.number),
-  des: PropTypes.string,
-  posterPath: PropTypes.string,
-};
-
-MovieListItem.defaultProps = {
-  movieTitle: '',
-  releaseDate: '',
-  genres: [],
-  des: '',
-  posterPath: '',
+  movie: PropTypes.instanceOf(Object),
 };
 
 export default MovieListItem;

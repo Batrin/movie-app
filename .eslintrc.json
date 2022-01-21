@@ -39,7 +39,9 @@
     "react/static-property-placement": "off",
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
     "jsx-a11y/no-autofocus": "off",
-    "no-underscore-dangle": "off"
+    "no-underscore-dangle": "off",
+    "react/require-default-props": "off",
+    "react/sort-comp": "off"
   },
   "settings": {
     "react": {
