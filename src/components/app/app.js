@@ -6,6 +6,8 @@ import MoviesWrapper from '../movies-wrapper';
 import Search from '../search';
 import 'antd/dist/antd.css';
 import './app.css';
+import Tabs from '../tabs';
+import { MoviesProvider } from '../movie-context';
 
 export default class App extends Component {
   state = {
@@ -15,16 +17,31 @@ export default class App extends Component {
     currentRes: {},
     currentSearchQuery: '',
     errorType: '',
+    currentTab: 'search',
   };
 
-  defaultMovieKeyword = 'return';
+  constructor() {
+    super();
+    this.moviesApi.getGenres().then((res) => {
+      this.genres = res.genres;
+    });
+  }
+
+  defaultMovieKeyword = 'Harry Potter';
 
   moviesApi = new ServicesApi();
 
   dataTransform = new DataTransform();
 
+  questSessionId = null;
+
+  genres = null;
+
   componentDidMount() {
     this.getMoviesBySearch(this.defaultMovieKeyword);
+    this.moviesApi.getQuestSessionId().then((res) => {
+      this.questSessionId = res.guest_session_id;
+    });
   }
 
   onError = (err) => {
@@ -58,7 +75,6 @@ export default class App extends Component {
     const movies = this.moviesApi
       .getMovieByKeyword(`${keyWord}`, page)
       .then((res) => {
-        console.log(res);
         return this.onSuccess(res);
       })
       .catch((err) => {
@@ -100,28 +116,66 @@ export default class App extends Component {
     this.getMoviesBySearch(currentSearchQuery, newPage);
   };
 
+  onTabClick = (event) => {
+    const { name } = event.target;
+    const { currentSearchQuery } = this.state;
+    this.setState({
+      currentTab: name,
+    });
+
+    if (name === 'rated') {
+      this.moviesApi.getRatedMovies(this.questSessionId).then((res) => {
+        this.setState({
+          currentRes: res,
+          movieList: res.results,
+        });
+      });
+    } else {
+      this.moviesApi.getMovieByKeyword(currentSearchQuery).then((res) => {
+        this.setState({
+          currentRes: res,
+          movieList: res.results,
+        });
+      });
+    }
+  };
+
+  setRating = (movieId, movieRating) => {
+    this.moviesApi.setMovieRating(movieId, movieRating, this.questSessionId);
+    localStorage.setItem(movieId, movieRating);
+  };
+
   render() {
-    const { movieList, isError, isLoading, currentRes, errorType } = this.state;
+    const { movieList, isError, isLoading, currentRes, errorType, currentTab } = this.state;
     const displayedData = this.transformMovieData(movieList);
+    let search = <Search getSearchMovies={this.getMoviesBySearch} defaultKeyword={this.defaultMovieKeyword} />;
+    if (currentTab === 'rated') {
+      search = null;
+    }
 
     return (
-      <div className="outer-wrapper">
-        <div className="inner-wrapper">
-          <Search getSearchMovies={this.getMoviesBySearch} defaultKeyword={this.defaultMovieKeyword} />
-          <MoviesWrapper
-            displayedMovies={displayedData}
-            isLoading={isLoading}
-            isError={isError}
-            errorType={errorType}
-          />
-          <Pagination
-            pageSize={20}
-            defaultCurrent={1}
-            total={currentRes.total_results}
-            onChange={this.onPaginationChange}
-          />
+      <MoviesProvider value={this.genres}>
+        <div className="outer-wrapper">
+          <div className="inner-wrapper">
+            <Tabs onTabClick={this.onTabClick} currentTab={currentTab} />
+            {search}
+            <MoviesWrapper
+              displayedMovies={displayedData}
+              isLoading={isLoading}
+              isError={isError}
+              errorType={errorType}
+              setRating={this.setRating}
+              currentTab={currentTab}
+            />
+            <Pagination
+              pageSize={20}
+              defaultCurrent={1}
+              total={currentRes.total_results}
+              onChange={this.onPaginationChange}
+            />
+          </div>
         </div>
-      </div>
+      </MoviesProvider>
     );
   }
 }

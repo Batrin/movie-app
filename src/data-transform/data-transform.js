@@ -2,7 +2,7 @@ import { format } from 'date-fns';
 
 export default class DataTransform {
   transformDate(date) {
-    if (!date.length) {
+    if (!date) {
       return this._defaultImageUrl;
     }
     return format(new Date(date), 'MMMM d, yyyy');
@@ -31,10 +31,20 @@ export default class DataTransform {
     return rating;
   }
 
-  transformGenres(genresArr) {
-    if (!genresArr.length) {
+  transformGenres(genresIdsArr) {
+    if (!genresIdsArr.length) {
       return 'Genres not added';
     }
-    return genresArr;
+
+    return genresIdsArr;
+  }
+
+  convertGenresArrToMap(genresNameArr) {
+    const genresMap = new Map();
+    genresNameArr.forEach((genre) => {
+      genresMap.set(genre.id, genre.name);
+    });
+
+    return genresMap;
   }
 }
