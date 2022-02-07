@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { Pagination } from 'antd';
 import ServicesApi from '../../services';
-import DataTransform from '../../data-transform/data-transform';
+import DataTransform from '../../utils/data-transform/data-transform';
 import MoviesWrapper from '../movies-wrapper';
 import Search from '../search';
 import 'antd/dist/antd.css';
 import './app.css';
 import Tabs from '../tabs';
-import { MoviesProvider } from '../movie-context';
+import { MoviesProvider } from '../../contexts/movie-context';
 
 export default class App extends Component {
   state = {
@@ -18,6 +18,7 @@ export default class App extends Component {
     currentSearchQuery: '',
     errorType: '',
     currentTab: 'search',
+    currentPage: 1,
   };
 
   constructor() {
@@ -38,7 +39,8 @@ export default class App extends Component {
   genres = null;
 
   componentDidMount() {
-    this.getMoviesBySearch(this.defaultMovieKeyword);
+    const { currentPage } = this.state;
+    this.getMoviesBySearch(this.defaultMovieKeyword, currentPage);
     this.moviesApi.getQuestSessionId().then((res) => {
       this.questSessionId = res.guest_session_id;
     });
@@ -113,12 +115,15 @@ export default class App extends Component {
   onPaginationChange = (event) => {
     const { currentSearchQuery } = this.state;
     const newPage = event;
+    this.setState({
+      currentPage: newPage,
+    });
     this.getMoviesBySearch(currentSearchQuery, newPage);
   };
 
   onTabClick = (event) => {
     const { name } = event.target;
-    const { currentSearchQuery } = this.state;
+    const { currentSearchQuery, currentPage } = this.state;
     this.setState({
       currentTab: name,
     });
@@ -131,7 +136,7 @@ export default class App extends Component {
         });
       });
     } else {
-      this.moviesApi.getMovieByKeyword(currentSearchQuery).then((res) => {
+      this.moviesApi.getMovieByKeyword(currentSearchQuery, currentPage).then((res) => {
         this.setState({
           currentRes: res,
           movieList: res.results,
@@ -146,12 +151,12 @@ export default class App extends Component {
   };
 
   render() {
-    const { movieList, isError, isLoading, currentRes, errorType, currentTab } = this.state;
+    const { movieList, isError, isLoading, currentRes, errorType, currentTab, currentPage } = this.state;
     const displayedData = this.transformMovieData(movieList);
-    let search = <Search getSearchMovies={this.getMoviesBySearch} defaultKeyword={this.defaultMovieKeyword} />;
-    if (currentTab === 'rated') {
-      search = null;
-    }
+    const search =
+      currentTab !== 'rated' ? (
+        <Search getSearchMovies={this.getMoviesBySearch} defaultKeyword={this.defaultMovieKeyword} />
+      ) : null;
 
     return (
       <MoviesProvider value={this.genres}>
@@ -170,6 +175,7 @@ export default class App extends Component {
             <Pagination
               pageSize={20}
               defaultCurrent={1}
+              current={currentPage}
               total={currentRes.total_results}
               onChange={this.onPaginationChange}
             />

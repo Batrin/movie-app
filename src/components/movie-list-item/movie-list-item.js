@@ -4,11 +4,11 @@ import './movie-list-item.css';
 import 'antd/dist/antd.css';
 import { Rate } from 'antd';
 import defaultImage from './defaultPoster.jpg';
-import { MoviesConsumer } from '../movie-context';
-import DataTransform from '../../data-transform/data-transform';
+import { MoviesConsumer } from '../../contexts/movie-context';
+import DataTransform from '../../utils/data-transform/data-transform';
 import Genre from '../genre';
 
-function MovieListItem({ movie, setRating, currentTab }) {
+function MovieListItem({ movie, setRating }) {
   const { movieId, movieTitle, movieReleaseDate, movieOverview, movieImageUrl, movieAvgRating, movieGenres } = movie;
   let movieImg = defaultImage;
   let ratingCircleClasses = 'movie-rating-circle';
@@ -17,9 +17,7 @@ function MovieListItem({ movie, setRating, currentTab }) {
 
   let movieRating = 0;
 
-  if (currentTab === 'rated') {
-    movieRating = Number(localStorage.getItem(movieId));
-  }
+  movieRating = Number(localStorage.getItem(movieId));
 
   if (movieImageUrl) {
     movieImg = movieImageUrl;
@@ -78,7 +76,6 @@ function MovieListItem({ movie, setRating, currentTab }) {
 MovieListItem.propTypes = {
   movie: PropTypes.instanceOf(Object),
   setRating: PropTypes.func,
-  currentTab: PropTypes.string,
 };
 
 export default MovieListItem;

@@ -1,17 +1,17 @@
+const endPoints = {
+  searchMovies: '/search/movie',
+  newQuestSession: '/authentication/guest_session/new',
+  setMovieRating: (movieId) => `/movie/${movieId}/rating`,
+  genres: '/genre/movie/list',
+  ratedMovies: (questSessionId) => `/guest_session/${questSessionId}/rated/movies`,
+};
+
 export default class ServicesApi {
   _apiKey = '6d476889060ccf750cd2a7fcf27210e7';
 
   _baseUrl = `https://api.themoviedb.org/3`;
 
   _imageApiUrl = 'https://image.tmdb.org/t/p/w500';
-
-  _endPoints = {
-    searchMovies: '/search/movie',
-    newQuestSession: '/authentication/guest_session/new',
-    setMovieRating: (movieId) => `/movie/${movieId}/rating`,
-    genres: '/genre/movie/list',
-    ratedMovies: (questSessionId) => `/guest_session/${questSessionId}/rated/movies`,
-  };
 
   async getResource(endPoint, url) {
     let fetchUrl = null;
@@ -29,12 +29,12 @@ export default class ServicesApi {
   }
 
   getMovieByKeyword(keyWord, page) {
-    const endPoint = this._endPoints.searchMovies;
+    const endPoint = endPoints.searchMovies;
     return this.getResource(endPoint, `query=${keyWord}&page=${page}`);
   }
 
   getQuestSessionId() {
-    const endPoint = this._endPoints.newQuestSession;
+    const endPoint = endPoints.newQuestSession;
     return this.getResource(endPoint);
   }
 
@@ -43,7 +43,7 @@ export default class ServicesApi {
       value: movieRatingValue,
     };
 
-    const customEndPoint = this._endPoints.setMovieRating(movieId);
+    const customEndPoint = endPoints.setMovieRating(movieId);
 
     const setMovieRateUrl = `${this._baseUrl}${customEndPoint}`;
     const setMovieRatePar = `?api_key=${this._apiKey}&guest_session_id=${questSessionId}`;
@@ -61,12 +61,12 @@ export default class ServicesApi {
   }
 
   getGenres() {
-    const endPoint = this._endPoints.genres;
+    const endPoint = endPoints.genres;
     return this.getResource(endPoint);
   }
 
   getRatedMovies(questSessionId) {
-    const endPoint = this._endPoints.ratedMovies(questSessionId);
+    const endPoint = endPoints.ratedMovies(questSessionId);
     return this.getResource(endPoint);
   }
 }
